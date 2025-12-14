@@ -8,7 +8,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>simple-notification-service</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <name>simple-notification-service</name>
     <description>simple-notification-service</description>
     <url/>

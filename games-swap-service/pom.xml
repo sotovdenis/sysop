@@ -8,7 +8,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>games-swap-service</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <name>games-swap-service</name>
     <description>games-swap-service</description>
     <url/>
