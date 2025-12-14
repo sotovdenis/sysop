@@ -1,0 +1,93 @@
+type Owner {
+    id: ID!
+    firstName: String!
+    lastName: String!
+    fathersName: String!
+    email: String!
+    games: [Game!]!
+}
+
+type Game {
+    id: ID!
+    title: String!
+    price: String!
+    description: String
+    owner: Owner!
+}
+
+type Booking {
+    id: ID!
+    oldOwner: Owner!
+    newOwner: Owner!
+    game: Game!
+    bookingDate: String!
+}
+
+type GamePage {
+    content: [Game!]!
+    pageNumber: Int!
+    pageSize: Int!
+    totalElements: Int!
+    totalPages: Int!
+    last: Boolean!
+}
+
+type BookingPage {
+    content: [Booking!]!
+    pageNumber: Int!
+    pageSize: Int!
+    totalElements: Int!
+    totalPages: Int!
+    last: Boolean!
+}
+
+type Query {
+    owners: [Owner!]!
+    ownerById(id: ID!): Owner
+
+    games(ownerId: ID, page: Int = 0, size: Int = 10): GamePage
+    gameById(id: ID!): Game
+
+    bookings(page: Int = 0, size: Int = 10): BookingPage
+    bookingById(id: ID!): Booking
+}
+
+input OwnerInput {
+    firstName: String!
+    lastName: String!
+    fathersName: String!
+    email: String!
+}
+
+input GameInput {
+    title: String!
+    price: String!
+    description: String
+    ownerId: ID!
+}
+
+input UpdateGameInput {
+    title: String!
+    price: String!
+    description: String
+}
+
+input BookingInput {
+    oldOwnerId: ID!
+    newOwnerId: ID!
+    gameId: ID!
+    bookingDate: String!
+}
+
+type Mutation {
+    createOwner(input: OwnerInput!): Owner
+    updateOwner(id: ID!, input: OwnerInput!): Owner
+    deleteOwner(id: ID!): ID
+
+    createGame(input: GameInput!): Game
+    updateGame(id: ID!, input: UpdateGameInput!): Game
+    deleteGame(id: ID!): ID
+
+    createBooking(input: BookingInput!): Booking
+    deleteBooking(id: ID!): ID
+}

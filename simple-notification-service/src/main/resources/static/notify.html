@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Уведомления</title>
+</head>
+<body>
+<h2>WebSocket-уведомления</h2>
+<input type="text" id="userId" placeholder="Введите ID пользователя" value="1">
+<button onclick="connect()">Подключиться</button>
+<div id="status">Статус: не подключено</div>
+<div id="messages" style="margin-top: 10px; padding: 10px; border: 1px solid #ccc; height: 200px; overflow-y: auto;"></div>
+
+<script>
+  let socket = null;
+
+  function connect() {
+    const userId = document.getElementById('userId').value.trim();
+    if (!userId) return alert("Введите ID!");
+
+    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const url = `${protocol}//${location.host}/ws/notifications?userId=${userId}`;
+
+    if (socket) socket.close();
+
+    socket = new WebSocket(url);
+
+    socket.onopen = () => {
+      document.getElementById('status').textContent = `Подключено как пользователь ${userId}`;
+      document.getElementById('status').style.color = 'green';
+    };
+
+    socket.onmessage = (event) => {
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${event.data}`;
+      document.getElementById('messages').appendChild(div);
+      document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+    };
+
+    socket.onclose = () => {
+      document.getElementById('status').textContent = 'Отключено';
+      document.getElementById('status').style.color = 'red';
+    };
+  }
+</script>
+</body>
+</html>
