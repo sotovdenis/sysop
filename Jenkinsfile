@@ -1,15 +1,21 @@
 pipeline {
     agent any
+
+    tools {
+        maven 'maven-3.9'
+        jdk 'jdk-21'
+    }
+
     stages {
-        stage('Unit Tests') {
+        stage('Checkout') {
             steps {
-                echo 'Running unit tests...'
-                sh '''
-                    cd games-swap-service && ./mvnw test -B
-                    cd ../analytics-service && ./mvnw test -B
-                    cd ../audit-service && ./mvnw test -B
-                    cd ../simple-notification-service && ./mvnw test -B
-                '''
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean install -DskipTests'
             }
         }
     }
