@@ -1,24 +1,16 @@
 pipeline {
-    agent any
-
-    tools {
-        maven 'maven-3.9.9'
-        jdk 'jdk-21'
+    agent {
+        docker {
+            image 'eclipse-temurin:21-jdk'
+            args '-v /var/maven/.m2:/root/.m2'
+        }
     }
 
     stages {
-        stage('Debug: Check JDK & Maven') {
-            steps {
-                sh 'echo "Java version:"'
-                sh 'java -version'
-                sh 'echo "JAVA_HOME: $JAVA_HOME"'
-                sh 'echo "Maven version:"'
-                sh 'mvn -v'
-            }
-        }
-
         stage('Build') {
             steps {
+                sh 'java -version'
+                sh 'mvn -version'
                 sh 'mvn clean install -DskipTests'
             }
         }
