@@ -111,8 +111,6 @@ public class GameEventListener {
                 event.gameId(), event.valueScore(), event.ownerId());
     }
 
-
-
     @RabbitListener(
             bindings = @QueueBinding(
                     value = @Queue(name = "notification-queue.dlq", durable = "true"),

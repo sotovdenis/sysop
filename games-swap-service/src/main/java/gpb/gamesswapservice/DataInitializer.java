@@ -24,6 +24,8 @@ public class DataInitializer implements CommandLineRunner {
         this.gameRepository = gameRepository;
     }
 
+
+
     @Override
     public void run(String... args) {
         LOG.info("Начинаю инициализацию тестовых данных...");
@@ -41,7 +43,7 @@ public class DataInitializer implements CommandLineRunner {
             LOG.info("Создан владелец: ID={}, имя={}", owner2.getId(), owner2.getFirstName());
 
             Game game1 = new Game("TEST", 1499d, "TESTTESTTEST", owner1);
-            Game game2 = new Game("Cyberpunk 2077", 2999d, "Игра про будущее в стиле киберпанк",owner2);
+            Game game2 = new Game("Cyberpunk 2077", 2999d, "Игра про будущее в стиле Киберпанк",owner2);
             Game game3 = new Game("Minecraft", 999d, "Песочница с кубиками", owner2);
 
             LOG.info("{} !!!!!!!",game1.getId());
