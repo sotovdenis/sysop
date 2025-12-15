@@ -30,6 +30,32 @@ pipeline {
             }
         }
 
+        stage('Clean Prometheus Config') {
+            steps {
+                sh '''
+                echo "Очищаем конфигурацию Prometheus..."
+                # Удаляем директорию или файл
+                rm -rf /var/jenkins_home/workspace/pipeline/prometheus/prometheus.yml
+                rm -rf prometheus/prometheus.yml
+
+                # Проверяем
+                ls -la prometheus/ || true
+                '''
+            }
+        }
+
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+                sh '''
+                echo "Очищаем workspace..."
+                docker system prune -af || true
+                docker volume prune -f || true
+                '''
+            }
+        }
+
+
                         stage('Prepare Prometheus config') {
                             steps {
                                 sh '''
