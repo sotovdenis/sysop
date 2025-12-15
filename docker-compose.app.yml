@@ -116,7 +116,6 @@ services:
       - SPRING_RABBITMQ_HOST=rabbitmq
       # Указываем адрес gRPC сервиса внутри сети Docker
       - GRPC_CLIENT_ANALYTICS_SERVICE_ADDRESS=static://analytics-service:9090
-
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mydb
       - SPRING_DATASOURCE_USERNAME=myuser
       - SPRING_DATASOURCE_PASSWORD=1234
