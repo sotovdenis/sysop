@@ -46,7 +46,6 @@ pipeline {
 
         stage('Clean Workspace') {
             steps {
-                cleanWs()
                 sh '''
                 echo "Очищаем workspace..."
                 docker system prune -af || true
