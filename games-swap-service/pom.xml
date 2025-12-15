@@ -44,12 +44,12 @@
         <dependency>
             <groupId>gpb</groupId>
             <artifactId>events-contract</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>gpb</groupId>
             <artifactId>games-swap-api</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
