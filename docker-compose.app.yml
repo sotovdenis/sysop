@@ -62,7 +62,7 @@ services:
   prometheus:
     image: prom/prometheus
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
     networks:
@@ -117,7 +117,7 @@ services:
       # Указываем адрес gRPC сервиса внутри сети Docker
       - GRPC_CLIENT_ANALYTICS_SERVICE_ADDRESS=static://analytics-service:9090
 
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://my-postgres:5432/mydb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mydb
       - SPRING_DATASOURCE_USERNAME=myuser
       - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update

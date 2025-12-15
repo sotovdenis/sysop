@@ -49,6 +49,18 @@ pipeline {
             }
         }
 
+        stage('Fix prometheus.yml') {
+            steps {
+                sh '''
+                if [ -d prometheus.yml ]; then
+                echo "❌ prometheus.yml is directory — removing"
+                rm -rf prometheus.yml
+                fi
+                '''
+            }
+        }
+
+
 //         stage('Deploy') {
 //             steps {
 //                 sh 'pwd'
