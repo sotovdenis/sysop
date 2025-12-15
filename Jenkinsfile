@@ -45,31 +45,31 @@ pipeline {
                         stage('Prepare Prometheus config') {
                             steps {
                                 sh '''
-                                # Удаляем, если вдруг осталась директория в корне
-                                if [ -e prometheus.yml ]; then
-                                    rm -rf prometheus.yml
+                                mkdir -p prometheus
+
+                                if [ -d prometheus/prometheus.yml ]; then
+                                    echo "❌ prometheus.yml — это директория, удаляем"
+                                    rm -rf prometheus/prometheus.yml
                                 fi
 
-                                if [ ! -f prometheus.yml ] || [ ! -s prometheus.yml ]; then
-                                    echo "✅ Создаём prometheus.yml в корне проекта"
-                                    cat > prometheus.yml << 'EOF'
-                        global:
-                          scrape_interval: 5s
-
-                        scrape_configs:
-                          - job_name: "sop"
-                            metrics_path: "/actuator/prometheus"
-                            static_configs:
-                              - targets:
-                                  [
-                                    "games-swap-service:8080",
-                                    "simple-notification-service:8083",
-                                    "audit-service:8082",
-                                    "analytics-service:8081"
-                                  ]
-                        EOF
+                                if [ ! -f prometheus/prometheus.yml ] || [ ! -s prometheus/prometheus.yml ]; then
+                                    echo "✅ Создаём prometheus.yml"
+                                    echo "global:" > prometheus/prometheus.yml
+                                    echo "  scrape_interval: 5s" >> prometheus/prometheus.yml
+                                    echo "" >> prometheus/prometheus.yml
+                                    echo "scrape_configs:" >> prometheus/prometheus.yml
+                                    echo "  - job_name: \\"sop\\"" >> prometheus/prometheus.yml
+                                    echo "    metrics_path: \\"/actuator/prometheus\\"" >> prometheus/prometheus.yml
+                                    echo "    static_configs:" >> prometheus/prometheus.yml
+                                    echo "      - targets:" >> prometheus/prometheus.yml
+                                    echo "          [" >> prometheus/prometheus.yml
+                                    echo "            \\"games-swap-service:8080\\"," >> prometheus/prometheus.yml
+                                    echo "            \\"simple-notification-service:8083\\"," >> prometheus/prometheus.yml
+                                    echo "            \\"audit-service:8082\\"," >> prometheus/prometheus.yml
+                                    echo "            \\"analytics-service:8081\\"" >> prometheus/prometheus.yml
+                                    echo "          ]" >> prometheus/prometheus.yml
                                 else
-                                    echo "✅ prometheus.yml уже существует в корне"
+                                    echo "✅ prometheus.yml уже существует"
                                 fi
                                 '''
                             }
