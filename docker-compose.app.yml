@@ -23,7 +23,7 @@ services:
   audit-service:
     build: ./audit-service
     ports:
-      - "8082:8082"
+      - "8089:8089"
     environment:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SERVER_PORT=8082
