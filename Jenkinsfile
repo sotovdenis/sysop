@@ -42,40 +42,40 @@ pipeline {
             }
         }
 
-                stage('Prepare Prometheus config') {
-                    steps {
-                        sh '''
-                        mkdir -p prometheus
+                        stage('Prepare Prometheus config') {
+                            steps {
+                                sh '''
+                mkdir -p prometheus
 
-                        if [ -d prometheus/prometheus.yml ]; then
-                            echo "❌ prometheus.yml — это директория, удаляем"
-                            rm -rf prometheus/prometheus.yml
-                        fi
+                if [ -d prometheus/prometheus.yml ]; then
+                    echo "❌ prometheus.yml — это директория, удаляем"
+                    rm -rf prometheus/prometheus.yml
+                fi
 
-                        if [ ! -f prometheus/prometheus.yml ] || [ ! -s prometheus/prometheus.yml ]; then
-                            echo "✅ Создаём prometheus.yml"
-                            cat > prometheus/prometheus.yml << 'EOF'
-        global:
-          scrape_interval: 5s
+                if [ ! -f prometheus/prometheus.yml ] || [ ! -s prometheus/prometheus.yml ]; then
+                    echo "✅ Создаём prometheus.yml"
+                    cat > prometheus/prometheus.yml << EOF
+                global:
+                  scrape_interval: 5s
 
-        scrape_configs:
-          - job_name: "sop"
-            metrics_path: "/actuator/prometheus"
-            static_configs:
-              - targets:
-                  [
-                    "games-swap-service:8080",
-                    "simple-notification-service:8083",
-                    "audit-service:8082",
-                    "analytics-service:8081"
-                  ]
-        EOF
-                        else
-                            echo "✅ prometheus.yml уже существует"
-                        fi
-                        '''
-                    }
-                }
+                scrape_configs:
+                  - job_name: "sop"
+                    metrics_path: "/actuator/prometheus"
+                    static_configs:
+                      - targets:
+                          [
+                            "games-swap-service:8080",
+                            "simple-notification-service:8083",
+                            "audit-service:8082",
+                            "analytics-service:8081"
+                          ]
+                EOF
+                else
+                    echo "✅ prometheus.yml уже существует"
+                fi
+                '''
+                            }
+                        }
 
 
         stage('Docker Compose Build') {
