@@ -56,8 +56,8 @@ pipeline {
                 sh 'ls -la prometheus/'
 
                 sh 'test -f prometheus.yml && echo "✅ prometheus.yml FOUND" || echo "❌ prometheus.yml MISSING"'
-                sh 'docker-compose down'
-                sh 'docker-compose up --build -d'
+                sh 'docker compose -f docker-compose.app.yml down'
+                sh 'docker compose -f docker-compose.app.yml up --build -d'
             }
         }
     }
