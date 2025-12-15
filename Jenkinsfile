@@ -30,6 +30,7 @@ pipeline {
         stage('Deploy App Services') {
             steps {
                 script {
+                    sh 'docker compose -f docker-compose.app.yml down --remove-orphans || true'
                     sh 'docker compose -f docker-compose.app.yml build --no-cache'
                     sh 'docker compose -f docker-compose.app.yml up -d'
                 }
