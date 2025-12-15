@@ -60,6 +60,45 @@ pipeline {
             }
         }
 
+        stage('Prepare Prometheus config') {
+            steps {
+                sh '''
+                # Создаем папку prometheus, если ее нет
+                mkdir -p prometheus
+
+                # Проверяем, если prometheus.yml — это папка, удаляем
+                if [ -d prometheus/prometheus.yml ]; then
+                    echo "❌ prometheus.yml is a directory — removing"
+                    rm -rf prometheus/prometheus.yml
+                fi
+
+                # Создаем файл prometheus.yml, если его нет или он пустой
+                if [ ! -f prometheus/prometheus.yml ] || [ ! -s prometheus/prometheus.yml ]; then
+                    echo "✅ Creating prometheus.yml"
+                    cat > prometheus/prometheus.yml <<EOF
+        global:
+          scrape_interval: 5s
+
+        scrape_configs:
+          - job_name: "sop"
+            metrics_path: "/actuator/prometheus"
+            static_configs:
+              - targets:
+                  [
+                    "games-swap-service:8080",
+                    "simple-notification-service:8083",
+                    "audit-service:8082",
+                    "analytics-service:8081"
+                  ]
+        EOF
+                else
+                    echo "✅ prometheus.yml already exists"
+                fi
+                '''
+            }
+        }
+
+
 
 //         stage('Deploy') {
 //             steps {
