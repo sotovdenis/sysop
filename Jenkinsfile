@@ -30,24 +30,6 @@ pipeline {
             }
         }
 
-        stage('Docker Compose Build') {
-            steps {
-                script {
-                            // Убедитесь, что Docker и docker-compose доступны
-                    sh 'docker --version'
-                    sh 'docker compose --version || docker compose version'
-
-                            // Удалить старые контейнеры и образы (опционально)
-                    sh 'docker compose -f docker-compose.app.yml down --remove-orphans || true'
-
-                            // Пересобрать образы
-                    sh 'docker compose -f docker-compose.app.yml build --no-cache'
-
-                            // Запустить контейнеры (если нужно)
-                    sh 'docker compose -f docker-compose.app.yml up -d'
-                }
-            }
-        }
 
         stage('Fix prometheus.yml') {
             steps {
@@ -97,6 +79,22 @@ pipeline {
                 '''
             }
         }
+
+        stage('Docker Compose Build') {
+                    steps {
+                        script {
+                            sh 'docker --version'
+
+                            sh 'docker compose --version || docker compose version'
+
+                            sh 'docker compose -f docker-compose.app.yml down --remove-orphans || true'
+
+                            sh 'docker compose -f docker-compose.app.yml build --no-cache'
+
+                            sh 'docker compose -f docker-compose.app.yml up -d'
+                        }
+                    }
+                }
 
 
 
