@@ -44,16 +44,6 @@ pipeline {
             }
         }
 
-        stage('Clean Workspace') {
-            steps {
-                sh '''
-                echo "Очищаем workspace..."
-                docker system prune -af || true
-                docker volume prune -f || true
-                '''
-            }
-        }
-
 
                         stage('Prepare Prometheus config') {
                             steps {
