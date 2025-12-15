@@ -38,13 +38,13 @@ pipeline {
                     sh 'docker compose --version || docker compose version'
 
                             // Удалить старые контейнеры и образы (опционально)
-                    sh 'docker compose down --remove-orphans || true'
+                    sh 'docker compose -f docker-compose.app.yml down --remove-orphans || true'
 
                             // Пересобрать образы
-                    sh 'docker compose build --no-cache'
+                    sh 'docker compose -f docker-compose.app.yml build --no-cache'
 
                             // Запустить контейнеры (если нужно)
-                    sh 'docker compose up -d'
+                    sh 'docker compose -f docker-compose.app.yml up -d'
                 }
             }
         }
