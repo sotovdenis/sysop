@@ -45,32 +45,49 @@ pipeline {
                         stage('Prepare Prometheus config') {
                             steps {
                                 sh '''
-                                mkdir -p prometheus
-
-                                if [ -d prometheus/prometheus.yml ]; then
-                                    echo "❌ prometheus.yml — это директория, удаляем"
-                                    rm -rf prometheus/prometheus.yml
+                                # Удаляем, если вдруг осталась директория в корне
+                                if [ -e prometheus.yml ]; then
+                                    rm -rf prometheus.yml
                                 fi
 
-                                if [ ! -f prometheus/prometheus.yml ] || [ ! -s prometheus/prometheus.yml ]; then
-                                    echo "✅ Создаём prometheus.yml"
-                                    echo "global:" > prometheus/prometheus.yml
-                                    echo "  scrape_interval: 5s" >> prometheus/prometheus.yml
-                                    echo "" >> prometheus/prometheus.yml
-                                    echo "scrape_configs:" >> prometheus/prometheus.yml
-                                    echo "  - job_name: \\"sop\\"" >> prometheus/prometheus.yml
-                                    echo "    metrics_path: \\"/actuator/prometheus\\"" >> prometheus/prometheus.yml
-                                    echo "    static_configs:" >> prometheus/prometheus.yml
-                                    echo "      - targets:" >> prometheus/prometheus.yml
-                                    echo "          [" >> prometheus/prometheus.yml
-                                    echo "            \\"games-swap-service:8080\\"," >> prometheus/prometheus.yml
-                                    echo "            \\"simple-notification-service:8083\\"," >> prometheus/prometheus.yml
-                                    echo "            \\"audit-service:8082\\"," >> prometheus/prometheus.yml
-                                    echo "            \\"analytics-service:8081\\"" >> prometheus/prometheus.yml
-                                    echo "          ]" >> prometheus/prometheus.yml
+                                if [ ! -f prometheus.yml ] || [ ! -s prometheus.yml ]; then
+                                    echo "✅ Создаём prometheus.yml в корне проекта"
+                                    cat > prometheus.yml << 'EOF'
+                        global:
+                          scrape_interval: 5s
+
+                        scrape_configs:
+                          - job_name: "sop"
+                            metrics_path: "/actuator/prometheus"
+                            static_configs:
+                              - targets:
+                                  [
+                                    "games-swap-service:8080",
+                                    "simple-notification-service:8083",
+                                    "audit-service:8082",
+                                    "analytics-service:8081"
+                                  ]
+                        EOF
                                 else
-                                    echo "✅ prometheus.yml уже существует"
+                                    echo "✅ prometheus.yml уже существует в корне"
                                 fi
+                                '''
+                            }
+                        }
+
+                        stage('Debug: Show prometheus.yml') {
+                            steps {
+                                sh '''
+                                echo "=== Содержимое корня ==="
+                                ls -la
+                                echo "=== Тип prometheus.yml ==="
+                                if [ -e prometheus.yml ]; then
+                                    stat prometheus.yml
+                                else
+                                    echo "❌ prometheus.yml не существует в корне"
+                                fi
+                                echo "=== Содержимое папки prometheus/ ==="
+                                ls -la prometheus/
                                 '''
                             }
                         }
