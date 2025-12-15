@@ -23,7 +23,7 @@ services:
 
   postgres:
     image: postgres:15
-    container_name: my-postgres
+    container_name: my-postgres2
     restart: always
     environment:
       POSTGRES_USER: myuser
