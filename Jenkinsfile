@@ -45,16 +45,13 @@ pipeline {
         stage('Prepare Prometheus config') {
             steps {
                 sh '''
-                # Создаем папку prometheus, если ее нет
                 mkdir -p prometheus
 
-                # Проверяем, если prometheus.yml — это папка, удаляем
                 if [ -d prometheus/prometheus.yml ]; then
                     echo "❌ prometheus.yml is a directory — removing"
                     rm -rf prometheus/prometheus.yml
                 fi
 
-                # Создаем файл prometheus.yml, если его нет или он пустой
                 if [ ! -f prometheus/prometheus.yml ] || [ ! -s prometheus/prometheus.yml ]; then
                     echo "✅ Creating prometheus.yml"
                     cat > prometheus/prometheus.yml <<EOF
@@ -79,6 +76,7 @@ pipeline {
                 '''
             }
         }
+
 
         stage('Docker Compose Build') {
                     steps {
