@@ -27,17 +27,11 @@ pipeline {
             }
         }
 
-        stage('Docker Compose Build') {
+        stage('Deploy App Services') {
             steps {
                 script {
-                    // Убедитесь, что Docker и docker-compose доступны
-                    sh 'docker --version'
-
-                    // Пересобрать образы
-                    sh 'docker compose build --no-cache'
-
-                    // Запустить контейнеры (если нужно)
-                    sh 'docker compose up -d'
+                    sh 'docker compose -f docker-compose.app.yml build --no-cache'
+                    sh 'docker compose -f docker-compose.app.yml up -d'
                 }
             }
         }
