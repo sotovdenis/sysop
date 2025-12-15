@@ -2,7 +2,6 @@ version: "3.8"
 
 services:
   jenkins:
-      # image: jenkins/jenkins:lts-jdk21   ← закомментируйте или удалите
     build:
       context: .
       dockerfile: jenkins.Dockerfile
@@ -49,7 +48,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # Инфраструктура: Брокер сообщений
   rabbitmq:
     image: rabbitmq:3.13-management
     ports:
@@ -63,7 +61,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Инфраструктура: Трассировка
   zipkin:
     image: openzipkin/zipkin
     ports:
@@ -71,7 +68,6 @@ services:
     networks:
       - microservices-net
 
-  # Инфраструктура: Метрики
   prometheus:
     image: prom/prometheus
     volumes:
@@ -81,11 +77,10 @@ services:
     networks:
       - microservices-net
 
-  # Микросервисы
   analytics-service:
     build: ./analytics-service
     ports:
-      - "9091:9090" # gRPC порт
+      - "9091:9090"
     environment:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SERVER_PORT=8081

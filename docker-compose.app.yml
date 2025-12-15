@@ -17,7 +17,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # Инфраструктура: Брокер сообщений
   rabbitmq:
     image: rabbitmq:3.13-management
     ports:
@@ -31,7 +30,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Инфраструктура: Трассировка
   zipkin:
     image: openzipkin/zipkin
     ports:
@@ -39,7 +37,6 @@ services:
     networks:
       - microservices-net
 
-  # Инфраструктура: Метрики
   prometheus:
     image: prom/prometheus
     build: ./prometheus
@@ -61,11 +58,10 @@ services:
     networks:
       - microservices-net
 
-  # Микросервисы
   analytics-service:
     build: ./analytics-service
     ports:
-      - "9091:9090" # gRPC порт
+      - "9091:9090"
     environment:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SERVER_PORT=8081
@@ -107,7 +103,6 @@ services:
       - "8080:8080"
     environment:
       - SPRING_RABBITMQ_HOST=rabbitmq
-      # Указываем адрес gRPC сервиса внутри сети Docker
       - GRPC_CLIENT_ANALYTICS_SERVICE_ADDRESS=static://analytics-service:9090
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mydb
       - SPRING_DATASOURCE_USERNAME=myuser
