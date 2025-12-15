@@ -3,7 +3,7 @@ services:
   analytics-service:
     build: ./analytics-service
     ports:
-      - "9091:9090"
+      - "9095:9090"
     environment:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SERVER_PORT=8081
