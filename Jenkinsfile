@@ -42,19 +42,19 @@ pipeline {
             }
         }
 
-        stage('Prepare Prometheus config') {
-            steps {
-                sh '''
-                mkdir -p prometheus
+                stage('Prepare Prometheus config') {
+                    steps {
+                        sh '''
+                        mkdir -p prometheus
 
-                if [ -d prometheus/prometheus.yml ]; then
-                    echo "❌ prometheus.yml is a directory — removing"
-                    rm -rf prometheus/prometheus.yml
-                fi
+                        if [ -d prometheus/prometheus.yml ]; then
+                            echo "❌ prometheus.yml — это директория, удаляем"
+                            rm -rf prometheus/prometheus.yml
+                        fi
 
-                if [ ! -f prometheus/prometheus.yml ] || [ ! -s prometheus/prometheus.yml ]; then
-                    echo "✅ Creating prometheus.yml"
-                    cat > prometheus/prometheus.yml <<EOF
+                        if [ ! -f prometheus/prometheus.yml ] || [ ! -s prometheus/prometheus.yml ]; then
+                            echo "✅ Создаём prometheus.yml"
+                            cat > prometheus/prometheus.yml << 'EOF'
         global:
           scrape_interval: 5s
 
@@ -70,12 +70,12 @@ pipeline {
                     "analytics-service:8081"
                   ]
         EOF
-                else
-                    echo "✅ prometheus.yml already exists"
-                fi
-                '''
-            }
-        }
+                        else
+                            echo "✅ prometheus.yml уже существует"
+                        fi
+                        '''
+                    }
+                }
 
 
         stage('Docker Compose Build') {
