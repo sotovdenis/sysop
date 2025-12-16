@@ -31,7 +31,7 @@
       <module name="analytics-service" options="" />
       <module name="audit-service" options="" />
       <module name="games-swap-api" options="" />
-      <module name="games-swap-service" options="" />
+      <module name="games-swap-service" options="-parameters" />
       <module name="simple-notification-service" options="" />
     </option>
   </component>
