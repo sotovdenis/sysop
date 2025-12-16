@@ -100,7 +100,7 @@ services:
   games-swap-service:
     build: ./games-swap-service
     ports:
-      - "8089:8089"
+      - "8585:8585"
     environment:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - GRPC_CLIENT_ANALYTICS_SERVICE_ADDRESS=static://analytics-service:9090
