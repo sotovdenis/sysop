@@ -1,5 +1,6 @@
 package gpb.gamesswapservice.service.impl;
 
+import events.GameArrivedEvent;
 import events.GameCreatedEvent;
 import events.GameDeletedEvent;
 import gpb.gamesswapapi.dto.request.GameRequest;
@@ -66,14 +67,19 @@ public class GameServiceImpl implements GameService {
 
         Game savedGame = gameRepository.save(game);
 
-        GameCreatedEvent event = new GameCreatedEvent(
-                game.getId(),
-                game.getTitle(),
-                game.getPrice(),
-                game.getDescription(),
-                owner.getId()
+        List<Long> demoOwnerIds = List.of(1L, 2L, 3L, 123L);
+
+        GameArrivedEvent arrivedEvent = new GameArrivedEvent(
+                savedGame.getId(),
+                savedGame.getTitle(),
+                demoOwnerIds
         );
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY_GAME_CREATED, event);
+
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE_NAME,
+                RabbitMQConfig.ROUTING_KEY_GAME_CREATED,
+                arrivedEvent
+        );
 
         return toGameResponse(savedGame);
     }

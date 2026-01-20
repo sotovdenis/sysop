@@ -17,7 +17,6 @@ public class GameCreatedListener {
         this.webSocketHandler = webSocketHandler;
     }
 
-    // Слушаем очередь, привязанную к fanout-обмену analytics-fanout
     @RabbitListener(queues = "game.created")
     public void handleOwnerRatedEvent(GameArrivedEvent event) {
         log.info("Получено событие (пожаловала новая игра): gameId={}, title={}", event.gameId(), event.title());

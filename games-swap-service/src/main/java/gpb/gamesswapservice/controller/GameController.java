@@ -36,22 +36,18 @@ public class GameController implements GameApi {
     private final GameService gameService;
     private final BookingService bookingService;
     private final BookingModelAssembler bookingModelAssembler;
-    private final RabbitTemplate rabbitTemplate;
-
-
 
     @Autowired
     public GameController(GameModelAssembler gameModelAssembler,
                           PagedResourcesAssembler<GameResponse> pagedResourcesAssembler,
                           GameService gameService, BookingService bookingService,
-                          BookingModelAssembler bookingModelAssembler, RabbitTemplate rabbitTemplate) {
+                          BookingModelAssembler bookingModelAssembler) {
 
         this.gameModelAssembler = gameModelAssembler;
         this.pagedResourcesAssembler = pagedResourcesAssembler;
         this.gameService = gameService;
         this.bookingService = bookingService;
         this.bookingModelAssembler = bookingModelAssembler;
-        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Override
@@ -75,25 +71,6 @@ public class GameController implements GameApi {
     @Override
     public EntityModel<GameResponse> createGame(@Valid GameRequest request) {
         GameResponse gameResponse = gameService.createGame(request);
-        List<Long> ownerIds = new ArrayList<>();
-
-        ownerIds.add(1L);
-        ownerIds.add(2L);
-        ownerIds.add(3L);
-        ownerIds.add(123L);
-
-
-        GameArrivedEvent gameArrivedEvent = new GameArrivedEvent(
-                gameResponse.getId(),
-                gameResponse.getTitle(),
-                ownerIds
-        );
-
-        rabbitTemplate.convertAndSend(
-                RabbitMQConfig.EXCHANGE_NAME,
-                RabbitMQConfig.ROUTING_KEY_GAME_CREATED,
-                gameArrivedEvent
-        );
         return gameModelAssembler.toModel(gameResponse);
     }
 

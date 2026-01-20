@@ -27,7 +27,6 @@ public class GameEventListener {
                     value = @Queue(
                             name = CREATED_QUEUE,
                             durable = "true",
-                            // если что-то пойдет не так, отправляем в 'dlx-exchange'
                             arguments = {
                                     @Argument(name = "x-dead-letter-exchange", value = "dlx-exchange"),
                                     @Argument(name = "x-dead-letter-routing-key", value = "dlq.notifications")
@@ -36,7 +35,6 @@ public class GameEventListener {
                     key = "game.created"
             )
     )
-    // Используем @Payload для явного указания параметра сообщения
     public void handleGameCreatedEvent(@Payload GameCreatedEvent event,
                                        Channel channel,
                                        @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) throws IOException {
@@ -45,14 +43,11 @@ public class GameEventListener {
             if (event.title() != null && event.title().equalsIgnoreCase("CRASH")) {
                 throw new RuntimeException("Simulating processing error for DLQ test");
             }
-            // Логика отправки уведомления...
             log.info("Notification sent for new game '{}'!", event.title());
-            // Отправляем подтверждение брокеру
             channel.basicAck(deliveryTag, false);
 
         } catch (Exception e) {
             log.error("Failed to process event: {}. Sending to DLQ.", event, e);
-            // Отправляем nack и НЕ просим вернуть в очередь (requeue=false)
             channel.basicNack(deliveryTag, false, false);
         }
     }

@@ -51,9 +51,4 @@ public class OwnerController implements OwnerApi {
         OwnerResponse updatedOwner = ownerService.update(id, request);
         return ownerModelAssembler.toModel(updatedOwner);
     }
-
-//    @Override
-//    public void deleteOwner(Long id) {
-//        ownerService.delete(id);
-//    }
 }

@@ -68,6 +68,19 @@ services:
     networks:
       - microservices-net
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: start-dev
+    environment:
+      - KC_HTTP_ENABLED=true
+      - KC_HOSTNAME_STRICT=false
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - "8069:8080"
+    networks:
+      - microservices-net
+
   prometheus:
     image: prom/prometheus
     volumes:
@@ -129,12 +142,15 @@ services:
       - SPRING_DATASOURCE_USERNAME=myuser
       - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/realms/test/protocol/openid-connect/certs
     depends_on:
       rabbitmq:
         condition: service_healthy
       analytics-service:
         condition: service_started
       postgres:
+        condition: service_started
+      keycloak:
         condition: service_started
     networks:
       - microservices-net

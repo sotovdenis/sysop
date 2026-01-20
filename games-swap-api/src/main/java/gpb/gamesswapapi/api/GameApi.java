@@ -53,14 +53,6 @@ public interface GameApi {
     @PostMapping(value = "/book", consumes = MediaType.APPLICATION_JSON_VALUE)
     EntityModel<BookingResponse> bookGame(@RequestBody BookingRequest request);
 
-//    @Operation(summary = "Вывести все игры")
-//    @ApiResponse(responseCode = "201", description = "Вот все игры")
-//    @ApiResponse(responseCode = "404", description = "Игра не найдена", content = {
-//            @Content(mediaType = "application/json", schema = @Schema(implementation = StatusResponse.class))
-//    })
-//    @GetMapping(value = "/api/games/all", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    List<GameResponse> findAll();
-
     @Operation(summary = "Получить игру по ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Игра найдена"),
