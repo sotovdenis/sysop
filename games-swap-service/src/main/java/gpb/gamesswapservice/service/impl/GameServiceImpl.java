@@ -1,10 +1,13 @@
 package gpb.gamesswapservice.service.impl;
 
 import events.GameArrivedEvent;
-import events.GameCreatedEvent;
 import events.GameDeletedEvent;
+import events.GameValuedEvent;
+import gpb.analyticsservice.AnalyticsServiceGrpc;
+import gpb.analyticsservice.GameValueRequest;
 import gpb.gamesswapapi.dto.request.GameRequest;
 import gpb.gamesswapapi.dto.response.GameResponse;
+import gpb.gamesswapapi.dto.response.GameValueResponse;
 import gpb.gamesswapapi.dto.response.OwnerResponse;
 import gpb.gamesswapapi.dto.response.PagedResponse;
 import gpb.gamesswapapi.exception.ResourceNotFoundException;
@@ -14,6 +17,9 @@ import gpb.gamesswapservice.entity.Owner;
 import gpb.gamesswapservice.repository.GameRepository;
 import gpb.gamesswapservice.repository.OwnerRepository;
 import gpb.gamesswapservice.service.GameService;
+import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +30,14 @@ import java.util.stream.Stream;
 @Service
 public class GameServiceImpl implements GameService {
 
+    private static final Logger log = LoggerFactory.getLogger(GameServiceImpl.class);
+
     private final GameRepository gameRepository;
     private final OwnerRepository ownerRepository;
     private final RabbitTemplate rabbitTemplate;
+
+    @GrpcClient("analytics-service")
+    private AnalyticsServiceGrpc.AnalyticsServiceBlockingStub analyticsStub;
 
     public GameServiceImpl(GameRepository gameRepository,
                            OwnerRepository ownerRepository,
@@ -81,6 +92,8 @@ public class GameServiceImpl implements GameService {
                 arrivedEvent
         );
 
+        log.info("Game created and event published: {}", savedGame.getId());
+
         return toGameResponse(savedGame);
     }
 
@@ -105,9 +118,66 @@ public class GameServiceImpl implements GameService {
 
         GameDeletedEvent event = new GameDeletedEvent(id);
 
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY_GAME_DELETED, event);
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE_NAME,
+                RabbitMQConfig.ROUTING_KEY_GAME_DELETED,
+                event
+        );
 
         gameRepository.deleteById(id);
+
+        log.info("Game deleted and event published: {}", id);
+    }
+
+    @Override
+    public GameValueResponse calculateGameValue(Long gameId, Long ownerId, String category) {
+        if (!gameRepository.existsById(gameId)) {
+            throw new ResourceNotFoundException("Game", gameId);
+        }
+
+        try {
+            log.info("Sending gRPC request to analytics-service for game: {}", gameId);
+
+            GameValueRequest grpcRequest = GameValueRequest.newBuilder()
+                    .setGameId(gameId)
+                    .setOwnerId(ownerId)
+                    .setCategory(category)
+                    .build();
+
+            gpb.analyticsservice.GameValueResponse grpcResponse =
+                    analyticsStub.calculateGameValue(grpcRequest);
+
+            log.info("Received gRPC response: gameId={}, valueScore={}, verdict={}",
+                    grpcResponse.getGameId(),
+                    grpcResponse.getValueScore(),
+                    grpcResponse.getVerdict());
+
+            GameValuedEvent event = new GameValuedEvent(
+                    grpcResponse.getGameId(),
+                    grpcResponse.getValueScore(),
+                    grpcResponse.getVerdict(),
+                    grpcResponse.getOwnerId()
+            );
+
+            rabbitTemplate.convertAndSend(
+                    RabbitMQConfig.FANOUT_EXCHANGE,
+                    "",
+                    event
+            );
+
+            log.info("GameValuedEvent published to fanout exchange");
+
+            return new GameValueResponse(
+                    grpcResponse.getGameId(),
+                    grpcResponse.getValueScore(),
+                    grpcResponse.getVerdict(),
+                    grpcResponse.getOwnerId()
+            );
+
+        } catch (Exception e) {
+            log.error("Failed to calculate game value for gameId: {}", gameId, e);
+            throw new RuntimeException("Game value calculation failed: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -117,7 +187,9 @@ public class GameServiceImpl implements GameService {
                 .sorted(Comparator.comparing(GameResponse::getId));
 
         if (ownerId != null) {
-            gamesStream = gamesStream.filter(game -> game.getOwner() != null && game.getOwner().getId().equals(ownerId));
+            gamesStream = gamesStream.filter(game ->
+                    game.getOwner() != null && game.getOwner().getId().equals(ownerId)
+            );
         }
 
         List<GameResponse> allGames = gamesStream.toList();
